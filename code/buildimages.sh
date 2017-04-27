@@ -73,6 +73,9 @@ build_and_push()
         "$BOONTADATA_DOCKER_REGISTRY/boontadata/sparkmaster")
             build_jar "$BOONTADATA_HOME/code/spark/master/code/target/scala-2.11/boontadata-spark-job1-assembly-0.1.jar" "$BOONTADATA_HOME/code/spark/master/code" "sbt clean assembly"
             ;;
+         "$BOONTADATA_DOCKER_REGISTRY/boontadata/sstreammaster")
+            build_jar "$BOONTADATA_HOME/code/sstream/master/code/target/scala-2.11/boontadata-sstream-job1-assembly-0.1.jar" "$BOONTADATA_HOME/code/sstream/master/code" "sbt clean assembly"
+            ;;
         *)
             ;;
     esac
@@ -107,8 +110,11 @@ build_and_push $BOONTADATA_HOME/code/flink/master
 build_and_push $BOONTADATA_HOME/code/flink/worker
 build_and_push $BOONTADATA_HOME/code/kafka-docker
 build_and_push $BOONTADATA_HOME/code/spark/base
+build_and_push $BOONTADATA_HOME/code/sstream/base
 build_and_push $BOONTADATA_HOME/code/spark/master
 build_and_push $BOONTADATA_HOME/code/spark/worker
+build_and_push $BOONTADATA_HOME/code/sstream/master
+build_and_push $BOONTADATA_HOME/code/sstream/worker
 build_and_push $BOONTADATA_HOME/code/zookeeper
 
 docker images

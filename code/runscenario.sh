@@ -74,6 +74,32 @@ scenario_spark()
     docker exec -ti sparkm1 bash -c "spark-submit --kill $sparksubmissionid --master spark://sparkm1:6066"
 }
 
+scenario_sstream()
+{
+    timeType=$1
+    echo "starting Structured Streaming scenario with $timeType"
+
+    echo "Initial content in the Cassandra database"    docker exec -ti cassandra3 cqlsh --execute "use boontadata; select count(*) as nb_debug from debug; select count(*) as nb_rawevents from raw_events; select count(*) as nb_aggevents from agg_events;"
+
+    echo "start sstream job"
+    docker exec -ti sstreamm1 bash -c ". start-job.sh" | tee /tmp/sstream-submission.txt
+    sparksubmissionid=`grep submissionId /tmp/spark-submission.txt | awk '{print $3}' | cut -d'"' -f 2`
+    tellandwaitnsecs 15
+
+    echo "inject data"
+    docker exec -ti client1 python /workdir/ingest.py
+
+    echo "wait for sstream to finish ingesting"
+    tellandwaitnsecs 10
+
+    echo "get the result"
+    docker exec -ti client1 python /workdir/compare.py
+
+    echo "kill the sstream job"
+    echo "sstream submission id is $sparksubmissionid"
+    docker exec -ti sstreamm1 bash -c "spark-submit --kill $sparksubmissionid --master spark://sstreamm1:6066"
+}
+
 scenario_truncate()
 {
     echo "Initial content in the Cassandra database"
@@ -105,6 +131,10 @@ case $scenario in
     spark1)
         scenario_truncate
         scenario_spark ProcessingTime
+        ;;
+     sstream1)
+        scenario_truncate
+        scenario_sstream ProcessingTime
         ;;
     truncate)
         scenario_truncate

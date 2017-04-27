@@ -1,4 +1,4 @@
-# $BOONTADATA_DOCKER_REGISTRY/boontadata/sparkbase
+# $BOONTADATA_DOCKER_REGISTRY/boontadata/sstreambase
 #
 # VERSION   0.1
 
